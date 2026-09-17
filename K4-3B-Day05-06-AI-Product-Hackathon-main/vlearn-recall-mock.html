@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VLearn Recall — Mock CP2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#FFFFFF;
+    --canvas:#FBFBFA;
+    --ink:#12141A;
+    --ink-soft:#6B7078;
+    --ink-faint:#9AA0A8;
+    --line:#E7E7E4;
+    --wine:#7A2632;
+    --wine-dark:#5E1D26;
+    --wine-tint:#F7EBEC;
+    --ok:#2E7D5B;
+    --ok-tint:#EAF4EE;
+    --hold:#A6631A;
+    --hold-tint:#FBF1E3;
+    --void:#5B5F66;
+    --void-tint:#F0F0EF;
+    --radius:16px;
+    --serif:'Fraunces', Georgia, serif;
+    --sans:'IBM Plex Sans', -apple-system, sans-serif;
+    --mono:'IBM Plex Mono', monospace;
+    --shadow: 0 1px 2px rgba(18,20,26,.04), 0 8px 24px -12px rgba(18,20,26,.12);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--canvas);
+    color:var(--ink);
+    font-family:var(--sans);
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:inherit;}
+
+  .app{ max-width:1100px; margin:0 auto; padding:44px 24px 80px; }
+
+  /* header */
+  .top{
+    display:flex; justify-content:space-between; align-items:center;
+    margin-bottom:56px;
+  }
+  .brand{ display:flex; align-items:center; gap:10px; }
+  .brand .mark{
+    width:30px; height:30px; border-radius:8px;
+    background:var(--wine); color:#fff;
+    display:flex; align-items:center; justify-content:center;
+    font-family:var(--serif); font-weight:700; font-size:15px;
+  }
+  .brand .name{ font-size:14.5px; font-weight:600; }
+  .brand .sep{ color:var(--ink-faint); }
+  .brand .path{ font-size:14.5px; color:var(--ink-soft); }
+  .phase{
+    font-family:var(--mono); font-size:11.5px; color:var(--ink-faint);
+    border:1px solid var(--line); border-radius:100px; padding:6px 13px;
+  }
+
+  /* hero */
+  .hero{ margin-bottom:48px; max-width:640px; }
+  .hero h1{
+    font-family:var(--serif);
+    font-weight:600;
+    font-size:clamp(34px,5vw,50px);
+    line-height:1.08;
+    letter-spacing:-0.015em;
+    margin:0 0 14px;
+  }
+  .hero h1 em{ font-style:italic; color:var(--wine); }
+  .hero p{ font-size:16px; color:var(--ink-soft); margin:0; max-width:480px; }
+
+  /* board */
+  .board{ display:grid; grid-template-columns:1fr; gap:20px; }
+  @media (min-width:900px){ .board{ grid-template-columns: 1fr 1.15fr; align-items:start; } }
+
+  .panel{
+    background:var(--bg);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+  }
+
+  /* composer */
+  .composer{ padding:30px 30px 28px; }
+  .composer .kicker{
+    font-size:12px; font-weight:600; letter-spacing:.02em;
+    color:var(--wine); margin:0 0 8px;
+  }
+  .composer h2{
+    font-family:var(--serif); font-weight:600; font-size:22px;
+    margin:0 0 20px; letter-spacing:-0.01em;
+  }
+  textarea{
+    width:100%; min-height:96px; resize:vertical;
+    border:1.5px solid var(--line); border-radius:12px;
+    padding:15px 16px; font-family:var(--sans); font-size:15px; color:var(--ink);
+    background:var(--canvas); outline:none;
+    transition:border-color .15s ease, background .15s ease;
+  }
+  textarea:focus{ border-color:var(--wine); background:#fff; }
+  textarea::placeholder{ color:var(--ink-faint); }
+
+  .label-row{
+    display:flex; align-items:center; gap:8px;
+    margin:24px 0 12px;
+  }
+  .label-row .line{ flex:1; height:1px; background:var(--line); }
+  .label-row span{ font-size:12px; font-weight:600; color:var(--ink-faint); white-space:nowrap; }
+
+  .chips{ display:flex; flex-direction:column; gap:9px; }
+  .chip{
+    text-align:left; width:100%;
+    border:1.5px solid var(--line); background:#fff;
+    border-radius:12px; padding:12px 14px;
+    font-size:13.5px; color:var(--ink); font-family:var(--sans);
+    cursor:pointer; transition:all .12s ease;
+    display:flex; align-items:center; gap:11px;
+  }
+  .chip .tag{
+    flex:none; font-family:var(--mono); font-size:10px; font-weight:500;
+    padding:3px 7px; border-radius:6px; color:#fff;
+  }
+  .chip[data-outcome="found"] .tag{ background:var(--ok); }
+  .chip[data-outcome="clarify"] .tag{ background:var(--hold); }
+  .chip[data-outcome="notfound"] .tag{ background:var(--void); }
+  .chip:hover{ border-color:var(--ink-faint); transform:translateY(-1px); }
+  .chip.active{ border-color:var(--wine); background:var(--wine-tint); }
+
+  .go-row{ margin-top:24px; display:flex; align-items:center; gap:16px; }
+  button.go{
+    font-family:var(--sans); font-weight:600; font-size:14.5px; color:#fff;
+    background:var(--wine); border:none; border-radius:11px; padding:13px 26px;
+    cursor:pointer; transition:background .15s ease, transform .05s ease;
+    box-shadow: 0 6px 16px -6px rgba(122,38,50,.55);
+  }
+  button.go:hover{ background:var(--wine-dark); }
+  button.go:active{ transform:translateY(1px); }
+  .go-status{ font-family:var(--mono); font-size:12px; color:var(--ink-faint); }
+
+  .scope{
+    margin-top:26px; padding-top:20px; border-top:1px solid var(--line);
+    font-size:12.5px; color:var(--ink-soft); line-height:1.6;
+  }
+  .scope b{ color:var(--ink); }
+
+  /* result */
+  .result{ padding:30px 30px 28px; min-height:460px; display:flex; flex-direction:column; box-shadow:var(--shadow); }
+  .result-head{ display:flex; justify-content:space-between; align-items:center; margin-bottom:22px; }
+  .result-head .lbl{ font-size:12px; font-weight:600; color:var(--ink-faint); }
+  .pill{
+    font-family:var(--mono); font-size:11px; font-weight:500;
+    padding:5px 12px; border-radius:100px; border:1.5px solid var(--line); color:var(--ink-faint);
+  }
+  .pill.found{ border-color:var(--ok); color:var(--ok); background:var(--ok-tint); }
+  .pill.clarify{ border-color:var(--hold); color:var(--hold); background:var(--hold-tint); }
+  .pill.notfound{ border-color:var(--void); color:var(--void); background:var(--void-tint); }
+
+  .rbody{ flex:1; display:flex; flex-direction:column; justify-content:center; }
+
+  .empty{ text-align:center; color:var(--ink-faint); padding:40px 20px; }
+  .empty svg{ margin-bottom:16px; }
+  .empty p{ font-size:14px; margin:0; max-width:260px; margin-inline:auto; line-height:1.6; }
+
+  .block{ animation:reveal .35s ease both; }
+  @keyframes reveal{ from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:translateY(0);} }
+
+  /* found */
+  .src-tag{
+    display:inline-flex; align-items:center; gap:7px;
+    font-family:var(--mono); font-size:11.5px; font-weight:500;
+    color:var(--ok); background:var(--ok-tint); border-radius:100px; padding:6px 13px;
+    margin-bottom:14px;
+  }
+  .quote{
+    border-left:3px solid var(--ok); padding:2px 0 2px 18px; margin-bottom:18px;
+  }
+  .quote p{
+    margin:0; font-family:var(--serif); font-size:19px; line-height:1.5;
+    font-weight:500; color:var(--ink); letter-spacing:-0.005em;
+  }
+  .quote mark{ background:transparent; color:var(--wine); font-style:italic; }
+  .answer{ font-size:14px; color:var(--ink-soft); margin:0 0 20px; line-height:1.65; }
+  .open-src{
+    display:inline-flex; align-items:center; gap:7px;
+    font-size:13.5px; font-weight:600; color:var(--ink); text-decoration:none;
+    background:var(--canvas); border:1.5px solid var(--line); border-radius:10px;
+    padding:10px 15px; width:fit-content; transition:border-color .12s ease;
+  }
+  .open-src:hover{ border-color:var(--ink); }
+
+  /* clarify */
+  .lead{ font-family:var(--serif); font-weight:600; font-size:20px; margin:0 0 10px; letter-spacing:-0.01em; }
+  .desc{ font-size:13.5px; color:var(--ink-soft); margin:0 0 18px; line-height:1.6; }
+  .opts{ display:flex; flex-direction:column; gap:8px; margin-bottom:18px; }
+  .opts button{
+    text-align:left; font-family:var(--sans); font-size:13.5px;
+    background:var(--hold-tint); border:1.5px solid #EAD3AD; color:#5C3D0E;
+    padding:11px 14px; border-radius:11px; cursor:pointer; transition:border-color .12s ease;
+  }
+  .opts button:hover{ border-color:var(--hold); }
+  .retry{ display:flex; gap:8px; }
+  .retry input{
+    flex:1; border:1.5px solid var(--line); border-radius:10px; padding:10px 13px;
+    font-size:13.5px; font-family:var(--sans);
+  }
+  .retry button{
+    border:none; background:var(--ink); color:#fff; border-radius:10px;
+    padding:10px 16px; font-size:13px; font-weight:600; cursor:pointer;
+  }
+
+  /* not found */
+  .honesty{
+    display:flex; gap:11px; align-items:flex-start;
+    background:var(--void-tint); border-radius:11px; padding:14px 16px;
+    font-size:13px; color:var(--ink-soft); line-height:1.6; margin-bottom:18px;
+  }
+  .honesty b{ color:var(--ink); }
+  .escalate{
+    font-size:13.5px; font-weight:600; color:#fff; background:var(--ink);
+    border:none; border-radius:10px; padding:11px 16px; cursor:pointer;
+  }
+
+  /* legend */
+  .legend{ margin-top:28px; padding:30px; }
+  .legend h3{ font-family:var(--serif); font-weight:600; font-size:19px; margin:0 0 4px; }
+  .legend .sub{ font-size:13.5px; color:var(--ink-soft); margin:0 0 22px; }
+  .lgrid{ display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
+  @media (max-width:760px){ .lgrid{ grid-template-columns:1fr; } }
+  .litem{ border-top:3px solid var(--line); padding-top:14px; }
+  .litem.found{ border-color:var(--ok); }
+  .litem.clarify{ border-color:var(--hold); }
+  .litem.notfound{ border-color:var(--void); }
+  .litem .name{ font-family:var(--mono); font-size:12px; font-weight:600; margin-bottom:6px; }
+  .litem.found .name{ color:var(--ok); }
+  .litem.clarify .name{ color:var(--hold); }
+  .litem.notfound .name{ color:var(--void); }
+  .litem p{ margin:0; font-size:13.5px; color:var(--ink-soft); line-height:1.55; }
+
+  footer{ margin-top:32px; text-align:center; font-size:12px; color:var(--ink-faint); }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="top">
+    <div class="brand">
+      <div class="mark">V</div>
+      <span class="name">VLearn</span>
+      <span class="sep">/</span>
+      <span class="path">Ôn tập / Recall</span>
+    </div>
+    <span class="phase">MOCK · CP2 · CHƯA CÓ AI THẬT</span>
+  </div>
+
+  <div class="hero">
+    <h1>Nhớ mang máng, <em>tìm lại đúng chỗ.</em></h1>
+    <p>Track A2 · VLearn Recall — mô phỏng 3 nhánh quyết định của AI trước khi nối model thật ở CP3.</p>
+  </div>
+
+  <div class="board">
+
+    <div class="panel composer">
+      <p class="kicker">BƯỚC 1</p>
+      <h2>Bạn nhớ mang máng gì đó?</h2>
+      <textarea id="q" placeholder="Gõ đúng cách bạn nhớ — không cần chính xác, không cần đúng thuật ngữ."></textarea>
+
+      <div class="label-row"><span>Hoặc thử câu thật từ khảo sát lớp</span><div class="line"></div></div>
+      <div class="chips" id="chips">
+        <button class="chip" data-outcome="found">
+          <span class="tag">01</span>
+          <span>“Attention là gì nhỉ, hình như thầy nói ở buổi nào đó rồi”</span>
+        </button>
+        <button class="chip" data-outcome="clarify">
+          <span class="tag">02</span>
+          <span>“Cái phần nói về việc LLM hay bịa thông tin ấy”</span>
+        </button>
+        <button class="chip" data-outcome="notfound">
+          <span class="tag">03</span>
+          <span>“Công thức tính lương tối thiểu vùng năm nay”</span>
+        </button>
+      </div>
+
+      <div class="go-row">
+        <button class="go" id="goBtn">Tìm lại</button>
+        <span class="go-status" id="status">chưa gửi</span>
+      </div>
+
+      <div class="scope">
+        <b>Phạm vi AI —</b> tự truy xuất & trả lời kèm trang/đoạn khi đủ căn cứ. Không tự suy đoán khi thiếu nguồn — luôn nói rõ và hỏi lại.
+      </div>
+    </div>
+
+    <div class="panel result">
+      <div class="result-head">
+        <span class="lbl">KẾT QUẢ</span>
+        <span class="pill" id="statePill">chờ truy vấn</span>
+      </div>
+      <div class="rbody" id="resultBody">
+        <div class="empty">
+          <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+            <circle cx="15" cy="15" r="10" stroke="#C7C9CC" stroke-width="2.2"/>
+            <line x1="22.5" y1="22.5" x2="30" y2="30" stroke="#C7C9CC" stroke-width="2.2" stroke-linecap="round"/>
+          </svg>
+          <p>Chọn một câu ví dụ bên trái, hoặc gõ điều bạn nhớ mang máng rồi bấm “Tìm lại”.</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="panel legend">
+    <h3>Ba trạng thái quyết định của AI</h3>
+    <p class="sub">Lõi của lát cắt — mỗi câu hỏi chỉ đi vào đúng một trong ba nhánh này.</p>
+    <div class="lgrid">
+      <div class="litem found">
+        <div class="name">FOUND</div>
+        <p>Tìm được đúng đoạn nguồn — trả lời kèm trích dẫn trang/mã đoạn cụ thể.</p>
+      </div>
+      <div class="litem clarify">
+        <div class="name">CLARIFY</div>
+        <p>Câu hỏi khớp nhiều chỗ hoặc còn mơ hồ — AI hỏi lại thay vì đoán bừa.</p>
+      </div>
+      <div class="litem notfound">
+        <div class="name">NOT_FOUND</div>
+        <p>Không có trong tài liệu đã học — nói rõ, không bịa nội dung.</p>
+      </div>
+    </div>
+  </div>
+
+  <footer>VLearn Recall · Mock CP2 · Lớp 3B · dữ liệu minh hoạ, không phải AI thật</footer>
+</div>
+
+<script>
+  const chips = document.querySelectorAll('.chip');
+  const q = document.getElementById('q');
+  const goBtn = document.getElementById('goBtn');
+  const status = document.getElementById('status');
+  const statePill = document.getElementById('statePill');
+  const resultBody = document.getElementById('resultBody');
+  let pendingOutcome = null;
+
+  chips.forEach(chip => {
+    chip.addEventListener('click', () => {
+      chips.forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      q.value = chip.textContent.trim().replace(/^\d+/, '').trim();
+      pendingOutcome = chip.dataset.outcome;
+      status.textContent = 'sẵn sàng gửi';
+    });
+  });
+
+  q.addEventListener('input', () => {
+    chips.forEach(c => c.classList.remove('active'));
+    pendingOutcome = null;
+    status.textContent = q.value.trim() ? 'sẵn sàng gửi' : 'chưa gửi';
+  });
+
+  goBtn.addEventListener('click', () => {
+    if(!q.value.trim()) return;
+    status.textContent = 'đang xử lý…';
+    statePill.textContent = 'đang xử lý';
+    statePill.className = 'pill';
+    resultBody.innerHTML = '<div class="empty"><p>Đang đối chiếu với transcript &amp; slide đã học…</p></div>';
+
+    setTimeout(() => {
+      const outcome = pendingOutcome || 'clarify';
+      render(outcome);
+      status.textContent = 'đã trả kết quả';
+    }, 550);
+  });
+
+  function render(outcome){
+    if(outcome === 'found'){
+      statePill.textContent = 'FOUND';
+      statePill.className = 'pill found';
+      resultBody.innerHTML = `
+        <div class="block">
+          <span class="src-tag">Transcript-06 · đoạn [T06-014]</span>
+          <div class="quote">
+            <p>“…cơ chế <mark>attention</mark> cho phép mô hình tập trung vào phần liên quan nhất của câu, thay vì đọc tuần tự từng từ một…”</p>
+          </div>
+          <p class="answer">Nội dung này nằm ở phút 32–35 của buổi giảng ngày 2, ngay sau phần giới thiệu kiến trúc Transformer.</p>
+          <a class="open-src" href="#">Mở đúng đoạn trong transcript →</a>
+        </div>`;
+    } else if(outcome === 'notfound'){
+      statePill.textContent = 'NOT_FOUND';
+      statePill.className = 'pill notfound';
+      resultBody.innerHTML = `
+        <div class="block">
+          <p class="lead">Không có trong tài liệu đã học</p>
+          <p class="desc">Đã đối chiếu toàn bộ transcript và slide của khoá — không tìm thấy nội dung này.</p>
+          <div class="honesty">
+            <span>◆</span>
+            <span><b>Không đoán khi thiếu căn cứ.</b> Đây có thể là kiến thức ngoài chương trình, hoặc bạn đang nhớ nhầm buổi học.</span>
+          </div>
+          <button class="escalate">Hỏi TA trên Discord</button>
+        </div>`;
+    } else {
+      statePill.textContent = 'CLARIFY';
+      statePill.className = 'pill clarify';
+      resultBody.innerHTML = `
+        <div class="block">
+          <p class="lead">Có vài chỗ nói gần ý này</p>
+          <p class="desc">Câu hỏi khớp nhiều đoạn khác nhau. Chọn đúng ngữ cảnh để nhận trích dẫn chính xác, thay vì AI tự đoán một chỗ.</p>
+          <div class="opts">
+            <button>Phần AI tự tạo ra thông tin sai (hallucination) — transcript-05</button>
+            <button>Phần AI trả lời chệch ý người hỏi — transcript-03</button>
+          </div>
+          <div class="retry">
+            <input type="text" placeholder="Hoặc mô tả rõ hơn ở đây…">
+            <button>Gửi lại</button>
+          </div>
+        </div>`;
+    }
+  }
+</script>
+</body>
+</html>

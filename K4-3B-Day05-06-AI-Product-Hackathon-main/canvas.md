@@ -1,0 +1,11 @@
+# Canvas 7 dòng (CP1) — VLearn Recall
+
+| # | Dòng | Nội dung |
+|---|---|---|
+| 1 | Track + đề | A2 · VLearn Recall — Tìm lại đúng nguồn khi chỉ nhớ mang máng nội dung |
+| 2 | Job executor (ai · đang ở đâu · làm gì) | Học viên đang ôn lại bài hoặc chuẩn bị quiz, chỉ nhớ một phần đã học |
+| 3 | Pain một câu (ai – đang làm gì – vướng đâu – hậu quả) | Học viên nhớ từ khóa mơ hồ nên phải lục lại slide/transcript, mất thời gian và dễ ôn sai phần quan trọng |
+| 4 | 1–2 bằng chứng đầu (số + cách đếm + mã hội thoại/tin nhắn, hoặc khảo sát/phỏng vấn có số người) | Khảo sát 20 học viên trong lớp: 17/20 (85%) không nhớ chính xác vị trí nội dung khi cần tìm lại (10/20 "nhớ bài nhưng không nhớ trang/đoạn", 7/20 "không nhớ nội dung nằm ở bài nào"); 17/20 (85%) mất từ 3 phút trở lên để tìm lại, trong đó 2 người bỏ cuộc hoàn toàn. Trích dẫn nguyên văn (ẩn danh): P02 "Không nhớ bài đó nằm ở file nào"; P07 "Nhiều lúc không thấy và không biết tìm ở đâu"; P11 "Việc không nhớ rõ được kiến thức đang nằm ở đâu gây tốn thời gian". 18/20 (90%) sẵn sàng dùng thử công cụ AI hỗ trợ. Cách đếm: lọc câu trả lời Q2 = "nhớ bài nhưng không nhớ trang/đoạn" hoặc "không nhớ nội dung nằm ở bài nào", kiểm lại được từ log form khảo sát. |
+| 5 | Lát cắt MỘT CÂU (1 user · 1 việc · 1 quyết định AI · 1 kết quả) | Học viên đang ôn bài, chỉ nhớ mang máng nội dung · AI quyết định tìm được đúng nguồn (trả lời kèm trang/đoạn) hay chưa đủ căn cứ để hỏi lại · kết quả là học viên định vị đúng chỗ cần xem lại thay vì tự dò cả buổi |
+| 6 | AI tự làm đến đâu + 1 dòng lý do · ≥3 willing users ngoài nhóm | Tự làm: truy xuất nguồn và trả lời kèm trang/đoạn khi tìm đủ căn cứ. Không tự làm: suy đoán khi không tìm được nguồn — phải nói rõ "chưa đủ căn cứ" và hỏi lại. Lý do: 85% học viên hiện không nhớ đúng vị trí, nếu AI đoán bừa dễ khiến học viên ôn sai trọng tâm. Willing users: Nguyễn Bá Chính - Học viên, từng gặp khó khi tìm lại nội dung bài giảng đã học, đồng ý thử prototype; Trương Việt Anh - Học viên, từng gặp pain này, đồng ý dùng thử |
+| 7 | Phân công có tên | Phạm Văn Hoàng Anh Tú - đội trưởng, repo + spec.md + nộp form; Lê Văn Sang - khảo sát, thu thập bằng chứng; Vũ Đình Thư - tổng hợp số liệu, golden set; Ngô Thế Khanh - thiết kế prompt, prototype, AI call |
