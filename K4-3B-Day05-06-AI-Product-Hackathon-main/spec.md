@@ -35,13 +35,39 @@ Loại: [ ] Tối ưu tính năng có sẵn  [x] Tính năng mới
 
 ## §4. Thiết kế
 
-- **Lát cắt MỘT CÂU:** Học viên đang ôn bài, chỉ nhớ mang máng nội dung · AI quyết định tìm được đúng nguồn (trả lời kèm trang/đoạn) hay chưa đủ căn cứ để hỏi lại · kết quả là học viên định vị đúng chỗ cần xem lại thay vì tự dò cả buổi.
-- **Non-goals (≥3 thứ KHÔNG build):**
-  1. Không tự tóm tắt toàn bộ bài giảng — chỉ định vị đúng đoạn liên quan.
-  2. Không sửa/tạo nội dung học liệu mới — chỉ trích dẫn nội dung đã có.
-  3. Không thay thế tutor hỏi-đáp hiện có của track A1 — đây là tính năng tìm kiếm/định vị riêng.
-- **Mức prototype nhắm tới:** [x] Mock — flow bấm được trọn 3 nhánh, dữ liệu trả lời hiện đang là dữ liệu giả (hard-code); phần AI thật (đối chiếu ngữ nghĩa với transcript) sẽ nối vào lõi ở CP3.
-- **Automation:** [x] Conditional — lý do theo cost-of-error: nếu AI luôn tự trả lời (Automate) mà đoán sai nguồn, học viên có thể ôn sai kiến thức — hậu quả học thuật nặng, khó tự phát hiện lỗi. Nếu AI luôn chỉ gợi ý cho người tự tìm (Augment) thì không giải quyết được pain chính (mất thời gian tự dò). Do đó chọn Conditional: AI tự trả lời kèm trích dẫn khi đủ căn cứ rõ ràng (FOUND), nhưng chuyển sang hỏi lại (CLARIFY) hoặc từ chối rõ ràng (NOT_FOUND) khi không đủ tín hiệu, thay vì đoán bừa.
+### Lát cắt MỘT CÂU
+Học viên đang ôn bài, chỉ nhớ mang máng nội dung → hệ thống tìm kiếm
+trong transcript VLearn và AI quyết định nội dung nào phù hợp dựa trên
+các đoạn được truy xuất → trả về câu trả lời kèm nguồn để học viên
+mở lại và kiểm tra nội dung gốc.
+
+### Non-goals
+1. Không tự tạo hoặc sửa nội dung bài giảng.
+2. Không trả lời kiến thức không có căn cứ trong nguồn VLearn.
+3. Không thay thế Tutor hỏi-đáp tổng quát; sản phẩm tập trung vào việc
+   tìm lại kiến thức đã học và nguồn tương ứng.
+
+### Mức prototype
+Working prototype ở lát cắt chính:
+Question → Retrieval → Relevant chunks → AI → Answer + Source.
+
+Prototype sử dụng dữ liệu transcript VLearn làm nguồn truy xuất.
+AI được gọi ở bước trung tâm để xử lý các đoạn nội dung đã tìm được
+và tạo câu trả lời có căn cứ.
+
+Nếu không tìm được nguồn đủ phù hợp, hệ thống không tự suy đoán mà
+thông báo chưa đủ căn cứ và yêu cầu học viên diễn đạt câu hỏi cụ thể hơn.
+
+### Mức automation
+Conditional Automation.
+
+AI tự động tìm nguồn và tạo câu trả lời khi có đủ căn cứ từ transcript.
+Khi không có nguồn phù hợp hoặc câu hỏi quá mơ hồ, hệ thống không tự
+đoán mà chuyển sang hỏi lại người dùng.
+
+Lý do: nếu AI trả lời sai nguồn, học viên có thể ôn sai kiến thức.
+Trong khi đó, việc yêu cầu học viên bổ sung thông tin chỉ tốn một thao
+tác nhỏ, nên ưu tiên độ tin cậy hơn việc luôn đưa ra câu trả lời.
 - **§4b. Nguyên tắc đã áp dụng (≥4 — HAX/PAIR):**
 
 | Nguyên tắc | Áp cụ thể vào đâu trong prototype |
