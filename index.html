@@ -1,0 +1,490 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="VLearn AI Finder giúp tìm lại kiến thức đã học theo ngữ nghĩa.">
+  <title>VLearn AI Knowledge Finder</title>
+  <style>
+    :root {
+      --primary: #2457d6;
+      --primary-soft: #eef3ff;
+      --ink: #172033;
+      --muted: #667085;
+      --line: #e5e9f2;
+      --surface: #ffffff;
+      --background: #f6f8fc;
+      --success: #18794e;
+    }
+
+    * { box-sizing: border-box; }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    body {
+      min-width: 320px;
+      margin: 0;
+      color: var(--ink);
+      background: var(--background);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    .app-shell {
+      display: grid;
+      min-height: 100vh;
+      grid-template-columns: 250px minmax(0, 1fr);
+    }
+
+    .sidebar {
+      position: sticky;
+      top: 0;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      padding: 24px 16px 18px;
+      border-right: 1px solid var(--line);
+      background: var(--surface);
+    }
+
+    .sidebar .brand { margin: 0 12px 34px; }
+    .brand { color: var(--primary); font-size: 21px; font-weight: 800; letter-spacing: -0.5px; }
+    .brand span { color: var(--ink); }
+    .nav-label { margin: 0 12px 10px; color: #98a2b3; font-size: 11px; font-weight: 800; letter-spacing: 0.8px; text-transform: uppercase; }
+    .sidebar nav { display: grid; gap: 5px; }
+    .nav-link {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-height: 46px;
+      padding: 0 12px;
+      border-radius: 10px;
+      color: #526074;
+      font-size: 14px;
+      font-weight: 650;
+      text-decoration: none;
+      transition: background 150ms ease, color 150ms ease;
+    }
+    .nav-link:hover { color: var(--primary); background: #f5f7ff; }
+    .nav-link.active { color: var(--primary); background: var(--primary-soft); }
+    .nav-icon { display: grid; width: 20px; height: 20px; place-items: center; }
+    .nav-icon svg { width: 19px; height: 19px; stroke: currentColor; stroke-width: 1.8; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+    .sidebar-bottom { margin-top: auto; padding: 16px 12px 0; border-top: 1px solid #eef1f6; }
+    .student { color: var(--ink); font-size: 13px; font-weight: 750; }
+    .student-plan { margin-top: 4px; color: var(--muted); font-size: 12px; }
+
+    .content { min-width: 0; }
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+      padding: 0 clamp(22px, 5vw, 60px);
+      border-bottom: 1px solid var(--line);
+      background: var(--surface);
+    }
+
+    .page-name { color: #475467; font-size: 14px; font-weight: 700; }
+    .tag { padding: 7px 12px; border-radius: 999px; color: var(--primary); background: var(--primary-soft); font-size: 13px; font-weight: 600; }
+
+    main { max-width: 980px; margin: 55px auto; padding: 0 22px; }
+    .hero { margin-bottom: 32px; text-align: center; }
+    .hero h1 { margin: 0 0 10px; font-size: clamp(30px, 5vw, 38px); letter-spacing: -1.2px; }
+    .hero p { max-width: 640px; margin: 0 auto; color: var(--muted); font-size: 17px; line-height: 1.55; }
+
+    .searchbox {
+      display: flex;
+      gap: 10px;
+      padding: 14px;
+      border-radius: 18px;
+      background: var(--surface);
+      box-shadow: 0 10px 35px rgba(25, 45, 90, 0.09);
+    }
+
+    input {
+      width: 100%;
+      min-width: 0;
+      padding: 15px;
+      border: 1px solid transparent;
+      border-radius: 12px;
+      outline: none;
+      color: var(--ink);
+      background: #f8faff;
+      font: inherit;
+      font-size: 16px;
+    }
+
+    input:focus { border-color: #9bb5ff; box-shadow: 0 0 0 3px rgba(36, 87, 214, 0.12); }
+
+    button {
+      min-height: 48px;
+      border: 0;
+      border-radius: 12px;
+      padding: 0 24px;
+      color: #fff;
+      background: var(--primary);
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 150ms ease, transform 150ms ease;
+    }
+
+    button:hover { background: #1e4ab8; }
+    button:active { transform: translateY(1px); }
+    button:focus-visible { outline: 3px solid #9bb5ff; outline-offset: 2px; }
+    .hint { margin: 12px 4px 35px; color: #8a94a6; font-size: 13px; line-height: 1.5; }
+
+    #results { display: none; }
+    .results-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 20px;
+      align-items: start;
+    }
+    .result-panel {
+      min-width: 0;
+      padding: 20px;
+      border: 1px solid #e6eaf2;
+      border-radius: 18px;
+      background: var(--surface);
+      box-shadow: 0 4px 15px rgba(25, 45, 90, 0.04);
+    }
+    .agent-panel { border-color: #cfdcff; background: linear-gradient(145deg, #f7f9ff 0%, #fff 55%); }
+    .panel-heading { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 18px; }
+    .panel-icon {
+      display: grid;
+      flex: none;
+      width: 38px;
+      height: 38px;
+      place-items: center;
+      border-radius: 11px;
+      color: var(--primary);
+      background: var(--primary-soft);
+      font-size: 19px;
+    }
+    .panel-heading h2 { margin: 0 0 3px; font-size: 17px; letter-spacing: -0.2px; }
+    .panel-heading p { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.45; }
+    .agent-answer { min-height: 174px; }
+    .agent-intro { margin: 0 0 12px; color: var(--muted); font-size: 13px; }
+    .answer-text { margin: 0 0 18px; color: #273248; font-size: 16px; line-height: 1.7; }
+    .answer-source { padding: 12px; border-radius: 10px; color: #4d5b73; background: #f1f5ff; font-size: 13px; line-height: 1.5; }
+    .answer-source strong { color: var(--ink); }
+    .search-results { display: grid; gap: 12px; }
+    .search-results .card { margin: 0; padding: 16px; }
+    .search-results .title { font-size: 16px; }
+    .search-results .excerpt { margin: 13px 0; font-size: 14px; }
+    .empty-state { margin: 0; color: var(--muted); line-height: 1.6; }
+    .section-title { margin-bottom: 12px; color: var(--muted); font-size: 14px; font-weight: 800; letter-spacing: 0.7px; text-transform: uppercase; }
+    .card { margin-bottom: 14px; padding: 22px; border: 1px solid #e6eaf2; border-radius: 16px; background: var(--surface); box-shadow: 0 4px 15px rgba(25, 45, 90, 0.04); }
+    .top { display: flex; justify-content: space-between; gap: 20px; }
+    .title { margin-bottom: 7px; font-size: 20px; font-weight: 800; line-height: 1.35; }
+    .meta, .source { color: var(--muted); font-size: 14px; }
+    .confidence { flex: none; height: max-content; padding: 6px 10px; border-radius: 999px; color: var(--success); background: #eaf8ef; font-size: 12px; font-weight: 700; }
+    .excerpt { margin: 18px 0; padding-left: 14px; border-left: 3px solid var(--primary); color: #414b5e; line-height: 1.65; }
+    .actions { display: flex; flex-wrap: wrap; gap: 10px; }
+    .secondary { min-height: 40px; padding: 0 14px; color: var(--primary); background: var(--primary-soft); }
+    .secondary:hover { background: #dce7ff; }
+    .source { margin-top: 12px; font-size: 13px; }
+    .loader { display: none; padding: 25px; color: var(--muted); text-align: center; }
+    footer { margin: 55px 0; color: #98a2b3; font-size: 13px; text-align: center; }
+
+    @media (max-width: 760px) {
+      .app-shell { display: block; }
+      .sidebar { position: static; height: auto; padding: 16px; border-right: 0; border-bottom: 1px solid var(--line); }
+      .sidebar .brand { margin: 0 4px 14px; }
+      .nav-label, .sidebar-bottom { display: none; }
+      .sidebar nav { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px; }
+      .nav-link { flex: none; min-height: 38px; padding: 0 10px; font-size: 13px; }
+      .nav-icon { width: 18px; height: 18px; }
+      .nav-icon svg { width: 17px; height: 17px; }
+      .results-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 600px) {
+      .topbar { padding: 0 20px; }
+      .tag { display: none; }
+      main { margin: 36px auto; padding: 0 16px; }
+      .searchbox { flex-direction: column; }
+      .searchbox button { padding: 12px 24px; }
+      .top { flex-direction: column; gap: 12px; }
+      .confidence { align-self: flex-start; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" aria-label="Điều hướng chính">
+      <div class="brand" aria-label="VLearn AI Finder">VLearn <span>AI Finder</span></div>
+      <div class="nav-label">Học tập</div>
+      <nav>
+        <a class="nav-link active" href="#home" data-page="Trang chủ" aria-current="page">
+          <span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg></span>
+          Trang chủ
+        </a>
+        <a class="nav-link" href="#courses" data-page="Khóa học">
+          <span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H6.5A2.5 2.5 0 0 0 4 21.5z"/><path d="M4 5.5v16"/></svg></span>
+          Khóa học
+        </a>
+        <a class="nav-link" href="#roadmap" data-page="Lộ trình học">
+          <span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="18" r="2"/><circle cx="18" cy="6" r="2"/><path d="M8 18h3a3 3 0 0 0 3-3v-6a3 3 0 0 1 3-3"/></svg></span>
+          Lộ trình học
+        </a>
+        <a class="nav-link" href="#library" data-page="Thư viện">
+          <span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h6v16H4zM14 4h6v16h-6zM10 8h4v12h-4z"/></svg></span>
+          Thư viện
+        </a>
+        <a class="nav-link" href="#calendar" data-page="Lịch học">
+          <span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/></svg></span>
+          Lịch học
+        </a>
+        <a class="nav-link" href="#assistant" data-page="Trợ lý AI">
+          <span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a7 7 0 0 0-7 7v4a4 4 0 0 0 4 4h1l2 3 2-3h1a4 4 0 0 0 4-4v-4a7 7 0 0 0-7-7z"/><path d="M9 11h.01M15 11h.01M9 15c1.7 1 4.3 1 6 0"/></svg></span>
+          Trợ lý AI
+        </a>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="student">Học viên VLearn</div>
+        <div class="student-plan">Gói học miễn phí</div>
+      </div>
+    </aside>
+
+    <div class="content">
+      <header class="topbar">
+        <div id="page-name" class="page-name">Trang chủ</div>
+        <div class="tag">AI Knowledge Retrieval Prototype</div>
+      </header>
+
+  <main>
+    <section class="hero" aria-labelledby="page-title">
+      <h1 id="page-title">Tìm lại kiến thức bạn đã học</h1>
+      <p>Không cần nhớ bài hay số slide. Hãy mô tả điều bạn còn nhớ.</p>
+    </section>
+
+    <form id="search-form" class="searchbox" role="search">
+      <label for="query" class="sr-only">Nội dung cần tìm</label>
+      <input id="query" name="query" value="Khi nào agent nên gọi tool?" placeholder="Ví dụ: Buổi trước có học về trường hợp agent nên gọi tool..." autocomplete="off">
+      <button type="submit">Tìm kiếm</button>
+    </form>
+    <p class="hint">AI tìm theo ý nghĩa câu hỏi và luôn dẫn về tài liệu gốc để bạn kiểm tra.</p>
+
+    <div id="loader" class="loader" role="status" aria-live="polite">AI đang tìm trong các bài học đã học...</div>
+
+    <section id="results" aria-live="polite" aria-label="Kết quả tìm kiếm">
+      <div class="results-grid">
+        <section class="result-panel agent-panel" aria-labelledby="agent-result-title">
+          <div class="panel-heading">
+            <div class="panel-icon" aria-hidden="true">✦</div>
+            <div>
+              <h2 id="agent-result-title">Agent trả lời</h2>
+              <p>Trả lời bằng AI, chỉ sử dụng các nguồn bài học liên quan.</p>
+            </div>
+          </div>
+          <div id="agent-answer" class="agent-answer"></div>
+        </section>
+
+        <section class="result-panel" aria-labelledby="search-result-title">
+          <div class="panel-heading">
+            <div class="panel-icon" aria-hidden="true">⌕</div>
+            <div>
+              <h2 id="search-result-title">Tìm kiếm thông thường</h2>
+              <p>Các bài học liên quan để bạn tự xem và đối chiếu.</p>
+            </div>
+          </div>
+          <div id="search-results" class="search-results"></div>
+        </section>
+      </div>
+    </section>
+  </main>
+
+      <footer>Prototype cho AI Product Hackathon · CP2</footer>
+    </div>
+  </div>
+
+  <script>
+    (() => {
+      const searchForm = document.getElementById('search-form');
+      const query = document.getElementById('query');
+      const results = document.getElementById('results');
+      const loader = document.getElementById('loader');
+      const agentAnswer = document.getElementById('agent-answer');
+      const searchResults = document.getElementById('search-results');
+
+      function node(tag, className, text) {
+        const element = document.createElement(tag);
+        if (className) element.className = className;
+        if (text !== undefined) element.textContent = text;
+        return element;
+      }
+
+      function sourceLabel(result) {
+        return [result.course_id, result.lecture_code, result.lecture_title]
+          .filter(Boolean)
+          .join(' · ');
+      }
+
+      function apiErrorMessage(payload, fallback) {
+        if (typeof payload?.detail === 'string') return payload.detail;
+        if (typeof payload?.error?.message === 'string') return payload.error.message;
+        return fallback;
+      }
+
+      function resultCard(result, primary) {
+        const card = node('article', 'card');
+        const top = node('div', 'top');
+        const heading = node('div');
+        heading.append(node('div', 'title', result.lecture_title));
+        heading.append(node('div', 'meta', sourceLabel(result)));
+        top.append(heading);
+        if (primary) top.append(node('div', 'confidence', 'Phù hợp nhất'));
+        card.append(top);
+        card.append(node('p', 'excerpt', result.excerpt));
+
+        const actions = node('div', 'actions');
+        const detailButton = node('button', 'secondary', 'Xem chi tiết');
+        detailButton.type = 'button';
+        detailButton.addEventListener('click', () => {
+          alert(`${result.matched_question}\n\n${result.excerpt}`);
+        });
+        actions.append(detailButton);
+        card.append(actions);
+
+        card.append(node('div', 'source', `Độ phù hợp: ${Math.round(result.score * 100)}% · Nguồn hỏi–đáp đã ẩn danh`));
+        return card;
+      }
+
+      function renderAgentAnswer(payload) {
+        agentAnswer.replaceChildren();
+        if (!payload?.answer) {
+          agentAnswer.append(node('p', 'empty-state', 'Agent chưa tìm được nguồn đủ phù hợp để trả lời câu hỏi này.'));
+          return;
+        }
+
+        agentAnswer.append(node('p', 'agent-intro', `Trả lời cho: “${payload.query}”`));
+        agentAnswer.append(node('p', 'answer-text', payload.answer));
+
+        if (payload.grounded && payload.sources?.length) {
+          const source = node('div', 'answer-source');
+          const sourceTitle = node('strong', null, 'Nguồn Agent đã dùng: ');
+          source.append(sourceTitle, document.createTextNode(payload.sources.map(sourceLabel).join(' • ')));
+          agentAnswer.append(source);
+        }
+      }
+
+      function renderResults(payload) {
+        const total = payload.results.length;
+        renderAgentAnswer(payload);
+        searchResults.replaceChildren();
+        if (total === 0) {
+          searchResults.append(node('p', 'empty-state', payload.message || 'Không tìm thấy lượt hỏi–đáp phù hợp. Hãy thử từ khóa cụ thể hơn hoặc bỏ bớt điều kiện.'));
+        } else {
+          payload.results.forEach((result, index) => {
+            searchResults.append(resultCard(result, index === 0));
+          });
+        }
+        results.style.display = 'block';
+        results.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+
+      searchForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const value = query.value.trim();
+        if (!value) {
+          query.focus();
+          return;
+        }
+        results.style.display = 'none';
+        loader.textContent = 'Agent đang tìm nguồn và soạn câu trả lời…';
+        loader.style.display = 'block';
+        try {
+          const response = await fetch('/api/agent', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ query: value, top_k: 10 })
+          });
+          const payload = await response.json();
+          if (!response.ok) throw new Error(apiErrorMessage(payload, 'Không thể tìm kiếm lúc này.'));
+          renderResults(payload);
+        } catch (error) {
+          renderAgentAnswer({
+            query: value,
+            answer: 'Agent hiện chưa thể xử lý yêu cầu này. Vui lòng thử lại sau.',
+            grounded: false,
+            sources: []
+          });
+          searchResults.replaceChildren(node('p', 'empty-state', error.message || 'Không thể kết nối backend tìm kiếm.'));
+          results.style.display = 'block';
+        } finally {
+          loader.style.display = 'none';
+        }
+      });
+
+      const pageName = document.getElementById('page-name');
+      document.querySelectorAll('.nav-link').forEach((link) => {
+        link.addEventListener('click', (event) => {
+          event.preventDefault();
+          document.querySelectorAll('.nav-link').forEach((item) => {
+            item.classList.remove('active');
+            item.removeAttribute('aria-current');
+          });
+          link.classList.add('active');
+          link.setAttribute('aria-current', 'page');
+          pageName.textContent = link.dataset.page;
+        });
+      });
+    })();
+
+    // Legacy prototype behaviour is retained below only as reference; it does
+    // not run because the live UI is backed by /api/search above.
+    if (false) {
+    const searchForm = document.getElementById('search-form');
+    const query = document.getElementById('query');
+    const results = document.getElementById('results');
+    const loader = document.getElementById('loader');
+
+    searchForm.addEventListener('submit', (event) => {
+      event.preventDefault();
+      if (!query.value.trim()) {
+        query.focus();
+        alert('Hãy nhập nội dung bạn muốn tìm.');
+        return;
+      }
+
+      results.style.display = 'none';
+      loader.style.display = 'block';
+      window.setTimeout(() => {
+        loader.style.display = 'none';
+        results.style.display = 'block';
+        results.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 700);
+    });
+
+    document.querySelectorAll('[data-prototype]').forEach((button) => {
+      button.addEventListener('click', () => alert(`Prototype: ${button.dataset.prototype}`));
+    });
+
+    const pageName = document.getElementById('page-name');
+    document.querySelectorAll('.nav-link').forEach((link) => {
+      link.addEventListener('click', (event) => {
+        event.preventDefault();
+        document.querySelectorAll('.nav-link').forEach((item) => {
+          item.classList.remove('active');
+          item.removeAttribute('aria-current');
+        });
+        link.classList.add('active');
+        link.setAttribute('aria-current', 'page');
+        pageName.textContent = link.dataset.page;
+      });
+    });
+    }
+  </script>
+</body>
+</html>

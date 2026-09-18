@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VLearn AI Knowledge Finder</title>
+<style>
+  *{box-sizing:border-box} body{margin:0;font-family:Inter,Arial,sans-serif;background:#f6f8fc;color:#172033}
+  header{height:64px;background:#fff;border-bottom:1px solid #e5e9f2;display:flex;align-items:center;padding:0 6%;justify-content:space-between}
+  .brand{font-size:21px;font-weight:800;color:#2457d6}.brand span{color:#172033}
+  .tag{font-size:13px;background:#eef3ff;color:#2457d6;padding:7px 12px;border-radius:999px}
+  main{max-width:980px;margin:55px auto;padding:0 22px}
+  .hero{text-align:center;margin-bottom:32px}.hero h1{font-size:38px;margin:0 0 10px}.hero p{color:#667085;font-size:17px}
+  .searchbox{background:#fff;padding:14px;border-radius:18px;box-shadow:0 10px 35px rgba(25,45,90,.09);display:flex;gap:10px}
+  input{flex:1;border:0;outline:0;font-size:16px;padding:15px;background:#f8faff;border-radius:12px}
+  button{border:0;background:#2457d6;color:#fff;font-weight:700;padding:0 24px;border-radius:12px;cursor:pointer}
+  .hint{font-size:13px;color:#8a94a6;margin:12px 4px 35px}
+  #results{display:none}.section-title{font-size:14px;font-weight:800;color:#667085;text-transform:uppercase;letter-spacing:.7px;margin-bottom:12px}
+  .card{background:#fff;border:1px solid #e6eaf2;border-radius:16px;padding:22px;margin-bottom:14px;box-shadow:0 4px 15px rgba(25,45,90,.04)}
+  .top{display:flex;justify-content:space-between;gap:20px}.title{font-size:20px;font-weight:800;margin-bottom:7px}
+  .meta{color:#667085;font-size:14px}.confidence{height:max-content;background:#eaf8ef;color:#18794e;padding:6px 10px;border-radius:999px;font-size:12px;font-weight:700}
+  .excerpt{margin:18px 0;color:#414b5e;line-height:1.65;border-left:3px solid #2457d6;padding-left:14px}
+  .actions{display:flex;gap:10px}.secondary{background:#eef3ff;color:#2457d6;padding:10px 14px}
+  .source{font-size:13px;color:#667085;margin-top:12px}.loader{display:none;text-align:center;padding:25px;color:#667085}
+  footer{text-align:center;color:#98a2b3;font-size:13px;margin:55px 0}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">VLearn <span>AI Finder</span></div>
+  <div class="tag">AI Knowledge Retrieval Prototype</div>
+</header>
+
+<main>
+  <section class="hero">
+    <h1>Tìm lại kiến thức bạn đã học</h1>
+    <p>Không cần nhớ bài hay số slide. Hãy mô tả điều bạn còn nhớ.</p>
+  </section>
+
+  <div class="searchbox">
+    <input id="query" value="Khi nào agent nên gọi tool?" placeholder="Ví dụ: Buổi trước có học về trường hợp agent nên gọi tool...">
+    <button onclick="searchKnowledge()">Tìm kiếm</button>
+  </div>
+  <div class="hint">AI tìm theo ý nghĩa câu hỏi và luôn dẫn về tài liệu gốc để bạn kiểm tra.</div>
+
+  <div id="loader" class="loader">AI đang tìm trong các bài học đã học...</div>
+
+  <section id="results">
+    <div class="section-title">Kết quả phù hợp nhất</div>
+    <div class="card">
+      <div class="top">
+        <div>
+          <div class="title">Tool Calling — Khi nào Agent cần dùng Tool?</div>
+          <div class="meta">Day 03 · AI Agent · Slide 27–31</div>
+        </div>
+        <div class="confidence">Độ phù hợp cao</div>
+      </div>
+      <div class="excerpt">
+        Agent cần gọi tool khi nhiệm vụ yêu cầu dữ liệu hoặc hành động mà model không thể tự thực hiện chỉ bằng kiến thức nội tại, ví dụ truy cập dữ liệu thực tế hoặc hệ thống bên ngoài.
+      </div>
+      <div class="actions">
+        <button class="secondary" onclick="alert('Prototype: mở Slide 27')">Mở slide</button>
+        <button class="secondary" onclick="alert('Prototype: mở bài học Day 03')">Xem bài học</button>
+      </div>
+      <div class="source">Nguồn: Day03 – AI Agent / Tool Calling</div>
+    </div>
+
+    <div class="section-title" style="margin-top:25px">Kết quả liên quan</div>
+    <div class="card">
+      <div class="title" style="font-size:17px">ReAct: Reason + Act</div>
+      <div class="meta">Day 03 · Slide 31</div>
+    </div>
+    <div class="card">
+      <div class="title" style="font-size:17px">Agent và dữ liệu thực tế</div>
+      <div class="meta">Day 03 · Slide 22</div>
+    </div>
+  </section>
+</main>
+
+<footer>Prototype cho AI Product Hackathon · CP2</footer>
+
+<script>
+function searchKnowledge(){
+  const q=document.getElementById('query').value.trim();
+  if(!q){alert('Hãy nhập nội dung bạn muốn tìm.');return;}
+  document.getElementById('results').style.display='none';
+  document.getElementById('loader').style.display='block';
+  setTimeout(()=>{
+    document.getElementById('loader').style.display='none';
+    document.getElementById('results').style.display='block';
+    document.getElementById('results').scrollIntoView({behavior:'smooth'});
+  },700);
+}
+document.getElementById('query').addEventListener('keydown',e=>{if(e.key==='Enter')searchKnowledge();});
+</script>
+</body>
+</html>
