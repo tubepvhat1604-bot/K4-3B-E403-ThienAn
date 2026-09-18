@@ -122,11 +122,17 @@ async function ask(){
     document.querySelectorAll('.opt-btn').forEach(b=>b.onclick=()=>{$('q').value=data.options[+b.dataset.opt];ask()});
   }
 
-  if(!LAST.length){
+  let cited0 = data.citation ? DOCS.find(d=>d.id===data.citation) : null;
+  if(!LAST.length && !cited0){
     $('sourceList').innerHTML = '<div class="meta" style="padding:10px 0">Không có đoạn nào khớp từ khoá ở tầng tìm kiếm cục bộ.</div>';
   } else {
-    let top=LAST.slice(0,3);
-    $('sourceList').innerHTML=top.map((d,i)=>`<div class="source"><div class="source-head"><div><div class="source-title">[${i+1}] ${esc(d.title)}</div><div class="meta">${esc(d.file)} · ${esc(d.id)}</div></div><span class="tag">${Math.min(99,Math.round(d.score*100))}%</span></div><div class="excerpt">${esc(d.text.slice(0,330))}${d.text.length>330?'…':''}</div><button class="soft open" data-i="${i}">Mở nguồn</button> <button class="soft save" data-i="${i}">☆ Lưu</button></div>`).join('');
+    // Ghim đúng đoạn mà AI THẬT đã trích dẫn lên đầu — không để lẫn với
+    // top-3 do rank() cục bộ tự tính, tránh nút "Mở nguồn" mở sai đoạn.
+    let cited = cited0;
+    let rest = LAST.filter(d=>!cited || d.id!==cited.id).slice(0, cited?2:3);
+    let top = cited ? [{...cited, score:1, __cited:true}, ...rest] : rest;
+    $('sourceList').innerHTML=top.map((d,i)=>`<div class="source"><div class="source-head"><div><div class="source-title">${d.__cited?'✓ Nguồn AI đã trích: ':`[${i+1}] `}${esc(d.title)}</div><div class="meta">${esc(d.file)} · ${esc(d.id)}</div></div><span class="tag" ${d.__cited?'style="background:#eaf8ef;color:#18794e"':''}>${d.__cited?'ĐÚNG NGUỒN':Math.min(99,Math.round(d.score*100))+'%'}</span></div><div class="excerpt">${esc(d.text.slice(0,330))}${d.text.length>330?'…':''}</div><button class="soft open" data-i="${i}">Mở nguồn</button> <button class="soft save" data-i="${i}">☆ Lưu</button></div>`).join('');
+    LAST = top; // để bind() mở đúng đối tượng đã render, kể cả chunk được ghim
     bind();
   }
   $('flash').textContent=q;FLASH=false;

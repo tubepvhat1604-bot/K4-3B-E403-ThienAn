@@ -87,11 +87,11 @@
       "note": "Transcript-03 — xu hướng AI trong giáo dục cá nhân hoá"
     },
     {
-      "id": "G13", "layer": null, "category": "common", "source": "constructed",
-      "query": "Cái ví dụ về prompt engineering thầy cho hôm trước ấy",
+      "id": "G13", "layer": null, "category": "common", "source": "real",
+      "query": "Cái đoạn nói về việc build nguyên cả đội agent, sub-agent làm việc với nhau, tốn nhiều token ấy",
       "expected_state": "FOUND",
-      "expected_citation_contains": "[mã đoạn]",
-      "note": ""
+      "expected_citation_contains": "T02-038",
+      "note": "Transcript-02 — mức độ phức tạp cao hơn trong xây agent: đội agent, sub-agent, chi phí token cao"
     },
     {
       "id": "G14", "layer": null, "category": "common", "source": "real",
@@ -108,11 +108,11 @@
       "note": "Transcript-03 — track MLOps, deploy hệ thống AI thực tế"
     },
     {
-      "id": "G16", "layer": null, "category": "common", "source": "constructed",
-      "query": "Chỗ nói về vì sao mô hình nhỏ đôi khi lại nhanh hơn ấy",
+      "id": "G16", "layer": null, "category": "common", "source": "real",
+      "query": "Có đoạn nào nói về việc kinh nghiệm người đi trước chỉ mang tính tham khảo, quan trọng là tự xây tư duy riêng không",
       "expected_state": "FOUND",
-      "expected_citation_contains": "[mã đoạn]",
-      "note": ""
+      "expected_citation_contains": "T01-068",
+      "note": "Transcript-01 — kinh nghiệm người cũ mang tính tham khảo, cần xây mental model riêng"
     },
     {
       "id": "G17", "layer": null, "category": "edge", "source": "constructed",
