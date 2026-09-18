@@ -34,7 +34,11 @@ Phải trích dẫn đúng mã đoạn [Txx-NNN] đã cho, KHÔNG được bịa
 có trong ngữ liệu.
 - Nếu câu hỏi khớp với 2 đoạn trở lên có chủ đề khác nhau, hoặc quá mơ hồ \
 để chọn 1 đoạn (nhưng vẫn là câu hỏi tìm nội dung, không phải yêu cầu làm việc khác) -> trạng thái CLARIFY. Liệt kê tối đa 2 lựa chọn ngữ cảnh cụ \
-thể để học viên chọn lại, KHÔNG tự chọn đại một đoạn.
+thể để học viên chọn lại, KHÔNG tự chọn đại một đoạn. Ngoài 2 lựa chọn, \
+answer PHẢI kèm thêm một gợi ý cụ thể học viên nên bổ sung thông tin gì \
+nếu cả 2 lựa chọn trên đều chưa đúng (ví dụ: buổi học nào, từ khoá liên \
+quan, hoặc học nội dung này để làm gì) — không chỉ đưa 2 lựa chọn rồi \
+dừng lại.
 - Nếu không đoạn nào trong ngữ liệu được cung cấp khớp với câu hỏi (và đây đúng là câu hỏi tìm nội dung) -> trạng \
 thái NOT_FOUND. KHÔNG được suy đoán hay bịa nội dung không có trong ngữ liệu.
 

@@ -120,8 +120,8 @@ Track A2 · Tìm lại nội dung đã học khi chỉ nhớ mang máng · Tính
 | ID | Nhận | Mong đợi | Phân loại nguyên nhân |
 |---|---|---|---|
 | G01 | CLARIFY | FOUND | **Vẫn là lỗi nhãn chưa sửa** — đã xác minh qua giao diện thật CLARIFY mới là đúng (câu hỏi khớp 2 đoạn T06-086, T06-027). Cần cập nhật `expected_state` trong golden set thành CLARIFY ở lượt sau. |
-| G08 | NOT_FOUND | FOUND (T01-062) | Retrieval không tìm thấy chunk dù từ khoá khá đặc trưng (Elon, Musk, SpaceX) — nghi vấn retrieval từ-khoá-thuần không đủ mạnh với câu hỏi diễn đạt gián tiếp |
-| G10 | NOT_FOUND | FOUND (T01-066) | Tương tự G08 — retrieval miss |
+| G08 | NOT_FOUND | FOUND (T06) | Retrieval miss — câu hỏi về công thức tính attention score (scaled dot-product), không tìm ra chunk dù đây là chi tiết kỹ thuật đặc thù domain |
+| G10 | NOT_FOUND | FOUND (T02-004) | Retrieval miss — câu hỏi về dùng Claude/ChatGPT tạo ảnh bằng code xuất PDF, tương tự G08 |
 | G12 | CLARIFY | FOUND (T03-012) | Câu hỏi ghép 2 ý trong 1 câu, retrieval chấm điểm dàn trải sang nhiều chunk không liên quan |
 | G15 | NOT_FOUND | FOUND (T03-015) | Retrieval miss, tương tự G08/G10 |
 | G16 | NOT_FOUND | FOUND (T01-068) | Đã sửa citation thật ở golden set nhưng retrieval vẫn không tìm ra chunk này — xác nhận đây là retrieval miss thật, không phải lỗi nhãn |
@@ -156,3 +156,5 @@ Track A2 · Tìm lại nội dung đã học khi chỉ nhớ mang máng · Tính
 | CP3 | Tích hợp AI thật (gpt-4o-mini), sửa retrieval từ cắt-mù-theo-file sang tách-đoạn-theo-mã; ghép giao diện với backend; chạy golden set lượt 1 = 60% | Phát hiện bug retrieval khi test câu hỏi "Attention" |
 | CP4 | Hoàn thiện §3, §5 (bảng chuẩn), §7 (hard gate + phân tích 8 case fail); phát hiện 3 lỗi cần sửa: placeholder G13/G16, prompt chưa từ chối rõ yêu cầu ngoài phạm vi (G06), giao diện mở nguồn không khớp citation thật; khoá Quality Bar ở trạng thái HOLD | Rà soát trung thực theo kết quả golden set thật, không chỉnh số để đạt bar |
 | CP4 — sửa lỗi | Sửa system prompt (từ chối rõ ràng yêu cầu ngoài phạm vi), sửa giao diện ghim đúng nguồn theo citation thật, điền citation thật cho G13/G16, thêm willing user thứ 3 (Nguyễn Đình Mạnh). Chạy lại golden set: 60% → 70%, cả 2 hard gate an toàn đã đạt | Tự kiểm thử nội bộ (code review + chạy lại golden set), KHÔNG phải từ phản hồi người dùng thật — validation với willing users vẫn chưa thực hiện, xem `validation/session-01.md` |
+
+| CP5 | Chạy validation R6 thật với 3 willing users (Nguyễn Bá Chính, Trương Việt Anh, Nguyễn Đình Mạnh — log tại `validation/session-01.md`). Phát hiện: (1) 2/3 người thử gặp khó khi câu hỏi mơ hồ — nhánh CLARIFY chưa hướng dẫn đủ cụ thể; (2) Mạnh (mức Cao) xác nhận retrieval keyword matching xếp sai khi câu hỏi diễn đạt khác từ ngữ transcript — khớp đúng nguyên nhân 5 case retrieval-miss đã biết ở §7.4. Đã sửa nhánh CLARIFY trong `ai_recall.py` để gợi ý cụ thể hơn khi 2 lựa chọn chưa đúng ý; chạy lại golden set để xác nhận an toàn — kết quả không đổi (70%, 14/20, 2 hard gate vẫn 100%), đúng như kỳ vọng vì thay đổi chỉ ở nội dung answer hiển thị, không ảnh hưởng logic state/citation. Giữ nguyên retrieval keyword matching (không đổi sang semantic search) vì đây là thay đổi kiến trúc lớn, làm vội trong vài giờ cuối rủi ro phá hard gate, đưa vào backlog. | Validation thật với người dùng ngoài nhóm |
