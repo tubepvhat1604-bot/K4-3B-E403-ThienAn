@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VLearn Recall — Learning Agent</title>
+<style>
+*{box-sizing:border-box} :root{--p:#315bd6;--p2:#6d56e8;--ink:#182238;--muted:#6d7890;--line:#e3e8f1;--bg:#f5f7fb;--card:#fff}
+body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--ink)}
+.app{display:grid;grid-template-columns:255px 1fr;min-height:100vh}
+aside{background:#111a36;color:white;padding:25px 17px;position:sticky;top:0;height:100vh}
+.logo{font-size:22px;font-weight:900}.logo span{color:#8ba8ff}.sub{font-size:12px;color:#9eabd0;margin:6px 0 31px}
+.nav button{display:flex;align-items:center;gap:11px;width:100%;border:0;background:transparent;color:#b7c2df;padding:12px 13px;border-radius:11px;margin:4px 0;font-weight:650;cursor:pointer;text-align:left}
+.nav button.active{background:#263762;color:white}.nav button:hover{background:#1c294f;color:white}
+.kb{position:absolute;bottom:22px;left:17px;right:17px;padding:13px;border:1px solid #2b3a65;border-radius:12px;color:#aab7da;font-size:12px;line-height:1.6}.kb b{color:#fff}
+main{min-width:0}.topbar{height:66px;background:white;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 34px}
+.page{font-weight:800}.status{font-size:12px;padding:7px 11px;border-radius:99px;background:#eaf8ef;color:#18794e;font-weight:800}
+.content{max-width:1100px;margin:auto;padding:34px}
+.hero{padding:30px;border-radius:24px;background:linear-gradient(135deg,#eef3ff,#f3efff);border:1px solid #dfe6fb}
+.hero h1{font-size:32px;margin:0 0 8px;letter-spacing:-.8px}.hero p{margin:0;color:var(--muted);line-height:1.6}
+.search{display:flex;gap:9px;margin-top:22px;background:white;padding:10px;border-radius:16px;box-shadow:0 10px 30px #29406a12}
+.search input{flex:1;border:0;outline:0;padding:12px;font-size:16px;min-width:0}.primary{border:0;border-radius:12px;padding:0 18px;background:var(--p);color:white;font-weight:800;cursor:pointer;min-height:46px}
+.primary:disabled{opacity:.6;cursor:wait}
+.chips{display:flex;gap:7px;flex-wrap:wrap;margin-top:13px}.chip{border:1px solid #dbe3f4;background:#fff9;color:#4e5f7c;border-radius:99px;padding:7px 10px;cursor:pointer}
+.grid{display:grid;grid-template-columns:1fr 310px;gap:15px;margin-top:20px}.card{background:white;border:1px solid var(--line);border-radius:18px;padding:19px}
+.agent-title{display:flex;justify-content:space-between;gap:10px;align-items:center}.agent-title h2{margin:0;font-size:18px}
+.tag{font-size:11px;font-weight:850;background:#edf2ff;color:#3159bd;padding:5px 8px;border-radius:7px}
+.tag.found{background:#eaf8ef;color:#18794e}.tag.clarify{background:#fff3e0;color:#a6631a}.tag.notfound{background:#f1f0ef;color:#5b5f66}
+.answer{margin-top:15px;line-height:1.75;color:#46536b;white-space:pre-wrap}.empty{padding:34px;text-align:center;color:#7b879d}
+.trace{background:#111a36;color:#dce5ff}.trace h3{margin-top:0}.step{padding:10px 0;border-bottom:1px solid #29375d;font-size:13px}.step:last-child{border:0}.dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#7da0ff;margin-right:8px}
+.sources{margin-top:15px}.source{border-top:1px solid var(--line);padding:14px 0}.source:first-child{border-top:0}.source-head{display:flex;justify-content:space-between;gap:8px}.source-title{font-weight:800;font-size:14px}.meta{font-size:12px;color:#8490a5;margin-top:4px}.excerpt{font-size:13px;line-height:1.6;color:#59667c;margin:9px 0}.soft{border:0;border-radius:9px;padding:8px 10px;background:#eef2fb;color:#3154ae;font-weight:750;cursor:pointer}
+.opt-btn{display:block;width:100%;text-align:left;border:1px solid #EAD3AD;background:#FBF1E3;color:#5C3D0E;border-radius:10px;padding:10px 12px;margin-top:8px;cursor:pointer;font-family:inherit}
+.view{display:none}.view.active{display:block}.section-head{display:flex;justify-content:space-between;gap:12px;align-items:end;margin-bottom:18px}.section-head h1{margin:0}.section-head p{margin:6px 0 0;color:var(--muted)}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.stat{background:white;border:1px solid var(--line);border-radius:16px;padding:18px}.num{font-size:28px;font-weight:900;color:var(--p)}
+.two{display:grid;grid-template-columns:repeat(2,1fr);gap:13px}.study-card{background:white;border:1px solid var(--line);border-radius:17px;padding:20px}.study-card h3{margin-top:0}
+.flash{min-height:150px;display:grid;place-items:center;text-align:center;background:#f7f9fd;border-radius:13px;padding:18px;font-weight:800;line-height:1.6}
+.saved-item{background:white;border:1px solid var(--line);border-radius:15px;padding:15px;margin-bottom:10px}
+.modal-bg{position:fixed;inset:0;background:#0d152b88;display:none;align-items:center;justify-content:center;padding:20px;z-index:10}.modal{background:white;border-radius:20px;width:min(820px,100%);max-height:82vh;overflow:auto;padding:22px}.modal-text{background:#f7f9fd;border:1px solid var(--line);border-radius:12px;padding:17px;line-height:1.8;margin-top:14px}
+@media(max-width:800px){.app{grid-template-columns:1fr}aside{display:none}.content{padding:18px}.topbar{padding:0 18px}.grid,.two,.stats{grid-template-columns:1fr}.search{flex-direction:column}.primary{height:46px}}
+</style></head>
+<body><div class="app">
+<aside><div class="logo">VLearn <span>Recall</span></div><div class="sub">AI Thực Chiến · Learning Agent</div>
+<div class="nav">
+<button class="active" data-view="home">✦ &nbsp;Recall Agent</button>
+<button data-view="library">▤ &nbsp;Kho bài học</button>
+<button data-view="saved">☆ &nbsp;Nguồn đã lưu</button>
+<button data-view="study">🧠 &nbsp;Study Tools</button>
+<button data-view="history">↻ &nbsp;Lịch sử Recall</button>
+</div>
+<div class="kb"><b>Knowledge Base</b><br><span id="kbCount">Đang tải…</span><br>6 transcript VLearn</div></aside>
+<main><div class="topbar"><div class="page" id="pageName">Recall Agent</div><div class="status">● Knowledge base ready</div></div>
+<div class="content">
+<section id="home" class="view active">
+<div class="hero"><h1>Không nhớ bài nào? Cứ hỏi.</h1><p>Recall Agent tìm lại đúng đoạn bài học, tổng hợp theo nguồn và cho bạn mở nội dung gốc để kiểm tra.</p>
+<div class="search"><input id="q" placeholder="Ví dụ: Khi nào nên dùng automation thay vì augmentation?"><button id="ask" class="primary">✦ Hỏi Recall Agent</button></div>
+<div class="chips"><button class="chip">Có nói về mấy cấp độ xây dựng agent, nhắc đến bài blog Anthropic không?</button><button class="chip">Sự khác biệt giữa người dùng AI giỏi và người mới?</button><button class="chip">Ví dụ Elon Musk dùng tư duy gì để giải bài toán SpaceX?</button></div></div>
+<div class="grid"><div class="card"><div class="agent-title"><h2>🤖 Recall Agent</h2><span class="tag" id="stateTag">GROUNDED</span></div><div id="answer" class="empty">Đặt một câu hỏi để Agent bắt đầu tìm trong bài học.</div><div id="sourceList" class="sources"></div></div>
+<div class="card trace"><h3>Agent Activity</h3><div id="trace"><div class="step"><span class="dot"></span>Đang chờ câu hỏi</div></div></div></div>
+</section>
+
+<section id="library" class="view"><div class="section-head"><div><h1>Kho bài học</h1><p>Toàn bộ nguồn đã được đưa vào Recall Agent.</p></div></div>
+<div class="stats"><div class="stat"><div class="num">6</div><div class="meta">Transcript</div></div><div class="stat"><div class="num" id="chunkStat">0</div><div class="meta">Đoạn kiến thức</div></div><div class="stat"><div class="num">100%</div><div class="meta">Có source ID</div></div></div>
+<div id="lessonList" style="margin-top:15px"></div></section>
+
+<section id="saved" class="view"><div class="section-head"><div><h1>Nguồn đã lưu</h1><p>Lưu các đoạn quan trọng để xem lại nhanh.</p></div></div><div id="savedList" class="empty">Chưa có nguồn nào được lưu.</div></section>
+
+<section id="study" class="view"><div class="section-head"><div><h1>Study Tools</h1><p>Ôn lại kiến thức vừa Recall.</p></div></div>
+<div class="two"><div class="study-card"><h3>🧠 Flashcard</h3><div id="flash" class="flash">Hỏi Recall Agent trước để tạo flashcard.</div><button id="flip" class="soft" style="margin-top:12px">Lật thẻ</button></div>
+<div class="study-card"><h3>📝 Quiz nhanh</h3><div id="quiz" class="flash">Agent sẽ tạo câu hỏi từ nguồn vừa tìm.</div><button id="newQuiz" class="soft" style="margin-top:12px">Tạo câu hỏi</button></div></div></section>
+
+<section id="history" class="view"><div class="section-head"><div><h1>Lịch sử Recall</h1><p>Các câu hỏi trong phiên hiện tại.</p></div></div><div id="historyList" class="empty">Chưa có câu hỏi nào.</div></section>
+</div></main></div>
+<div class="modal-bg" id="modalBg"><div class="modal"><button class="soft" id="close" style="float:right">Đóng</button><span class="tag">SOURCE GỐC</span><h2 id="mt"></h2><div id="mm" class="meta"></div><div id="mx" class="modal-text"></div></div></div>
+<script>
+let DOCS=[],LAST=[],SAVED=[],HISTORY=[],FLASH=false,QUIZ=0;
+const $=x=>document.getElementById(x), norm=s=>s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/đ/g,'d');
+const tokens=s=>norm(s).split(/[^a-z0-9]+/).filter(x=>x.length>1);
+function rank(q){let qt=[...new Set(tokens(q))];return DOCS.map(d=>{let t=norm(d.text+' '+d.title),s=0;qt.forEach(x=>{if(t.includes(x))s+=x.length>5?3:1});return {...d,score:s/Math.max(1,qt.length*3)}}).filter(x=>x.score>0).sort((a,b)=>b.score-a.score).slice(0,5)}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+
+// ---- gọi AI thật qua backend (app.py) thay vì trả lời giả cứng ----
+async function callBackend(question){
+  const res = await fetch('/recall', {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({question})
+  });
+  if(!res.ok) throw new Error('backend lỗi '+res.status);
+  return res.json();
+}
+
+async function ask(){
+  let q=$('q').value.trim();if(q.length<2)return;
+  LAST=rank(q);
+  HISTORY.unshift({q,time:new Date().toLocaleTimeString('vi-VN')});renderHistory();
+
+  $('ask').disabled=true;$('ask').textContent='Đang hỏi AI…';
+  $('answer').className='empty';$('answer').textContent='Đang gọi AI thật, chờ chút…';
+  $('sourceList').innerHTML='';
+  $('trace').innerHTML='<div class="step"><span class="dot"></span>✓ Hiểu câu hỏi</div><div class="step"><span class="dot"></span>✓ Tìm trong '+DOCS.length+' chunks (local rank)</div><div class="step"><span class="dot"></span>⏳ Đang gọi AI thật để quyết định FOUND/CLARIFY/NOT_FOUND…</div>';
+
+  let data;
+  try{
+    data = await callBackend(q);
+  }catch(e){
+    $('answer').className='empty';
+    $('answer').textContent='Không kết nối được AI backend. Kiểm tra đã chạy "python codebase/app.py" chưa, và đang mở trang qua http://localhost:5000/ (không phải mở file trực tiếp).';
+    $('ask').disabled=false;$('ask').textContent='✦ Hỏi Recall Agent';
+    return;
+  }
+
+  const stateLabel = {FOUND:'FOUND',CLARIFY:'CLARIFY',NOT_FOUND:'NOT_FOUND'}[data.state] || data.state;
+  const stateClass = {FOUND:'found',CLARIFY:'clarify',NOT_FOUND:'notfound'}[data.state] || '';
+  $('stateTag').textContent = stateLabel;
+  $('stateTag').className = 'tag ' + stateClass;
+
+  $('trace').innerHTML='<div class="step"><span class="dot"></span>✓ Hiểu câu hỏi</div><div class="step"><span class="dot"></span>✓ Tìm trong '+DOCS.length+' chunks</div><div class="step"><span class="dot"></span>✓ Gọi AI thật (gpt-4o-mini)</div><div class="step"><span class="dot"></span>✓ Trạng thái: '+stateLabel+'</div><div class="step"><span class="dot"></span>✓ '+(data.citation?('Trích dẫn: '+esc(data.citation)):'Không bịa khi thiếu căn cứ')+'</div>';
+
+  $('answer').className='answer';
+  $('answer').textContent = data.answer || '(không có câu trả lời)';
+
+  if(data.state==='CLARIFY' && Array.isArray(data.options) && data.options.length){
+    let optHtml = data.options.map((o,i)=>`<button class="opt-btn" data-opt="${i}">${esc(o)}</button>`).join('');
+    $('answer').innerHTML += '<div style="margin-top:12px"><b>Bạn muốn hỏi rõ về:</b></div>' + optHtml;
+    document.querySelectorAll('.opt-btn').forEach(b=>b.onclick=()=>{$('q').value=data.options[+b.dataset.opt];ask()});
+  }
+
+  if(!LAST.length){
+    $('sourceList').innerHTML = '<div class="meta" style="padding:10px 0">Không có đoạn nào khớp từ khoá ở tầng tìm kiếm cục bộ.</div>';
+  } else {
+    let top=LAST.slice(0,3);
+    $('sourceList').innerHTML=top.map((d,i)=>`<div class="source"><div class="source-head"><div><div class="source-title">[${i+1}] ${esc(d.title)}</div><div class="meta">${esc(d.file)} · ${esc(d.id)}</div></div><span class="tag">${Math.min(99,Math.round(d.score*100))}%</span></div><div class="excerpt">${esc(d.text.slice(0,330))}${d.text.length>330?'…':''}</div><button class="soft open" data-i="${i}">Mở nguồn</button> <button class="soft save" data-i="${i}">☆ Lưu</button></div>`).join('');
+    bind();
+  }
+  $('flash').textContent=q;FLASH=false;
+  $('ask').disabled=false;$('ask').textContent='✦ Hỏi Recall Agent';
+}
+
+function bind(){document.querySelectorAll('.open').forEach(b=>b.onclick=()=>openSource(LAST[+b.dataset.i]));document.querySelectorAll('.save').forEach(b=>b.onclick=()=>{let d=LAST[+b.dataset.i];if(!SAVED.some(x=>x.id===d.id))SAVED.push(d);renderSaved();b.textContent='✓ Đã lưu'})}
+function openSource(d){$('mt').textContent=d.title;$('mm').textContent=d.file+' · '+d.id;$('mx').textContent=d.text;$('modalBg').style.display='flex'}
+function renderSaved(){$('savedList').className='';$('savedList').innerHTML=SAVED.length?SAVED.map(d=>`<div class="saved-item"><b>${esc(d.title)}</b><div class="meta">${esc(d.file)} · ${esc(d.id)}</div><p class="excerpt">${esc(d.text.slice(0,240))}…</p><button class="soft" onclick="openSource(SAVED.find(x=>x.id==='${d.id}'))">Mở nguồn</button></div>`).join(''):'<div class="empty">Chưa có nguồn nào được lưu.</div>'}
+function renderHistory(){$('historyList').className='';$('historyList').innerHTML=HISTORY.length?HISTORY.map(h=>`<div class="saved-item"><b>${esc(h.q)}</b><div class="meta">${h.time}</div></div>`).join(''):'<div class="empty">Chưa có câu hỏi nào.</div>'}
+function renderLessons(){let g={};DOCS.forEach(d=>(g[d.file]??=[]).push(d));$('lessonList').innerHTML=Object.entries(g).map(([f,a])=>`<div class="saved-item"><div class="source-head"><div><b>${esc(a[0].title)}</b><div class="meta">${esc(f)}</div></div><span class="tag">${a.length} chunks</span></div></div>`).join('')}
+document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>{document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.querySelectorAll('.view').forEach(x=>x.classList.remove('active'));$(b.dataset.view).classList.add('active');$('pageName').textContent=b.textContent.trim()});
+$('ask').onclick=ask;$('q').onkeydown=e=>{if(e.key==='Enter')ask()};document.querySelectorAll('.chip').forEach(b=>b.onclick=()=>{$('q').value=b.textContent;ask()});
+$('close').onclick=()=>$('modalBg').style.display='none';$('modalBg').onclick=e=>{if(e.target===$('modalBg'))$('modalBg').style.display='none'};
+$('flip').onclick=()=>{if(!LAST.length)return;$('flash').textContent=FLASH?$('q').value:LAST[0].text.slice(0,420);FLASH=!FLASH};
+$('newQuiz').onclick=()=>{if(!LAST.length)return;let d=LAST[QUIZ++%Math.min(3,LAST.length)];$('quiz').innerHTML=`Đoạn <b>${esc(d.id)}</b> đang giải thích ý chính nào?<br><br><span class="meta">Hãy tự trả lời rồi mở nguồn để kiểm tra.</span>`};
+fetch('vlearn_data.json').then(r=>r.json()).then(d=>{DOCS=d;$('kbCount').textContent=d.length+' knowledge chunks';$('chunkStat').textContent=d.length;renderLessons()}).catch(()=>{$('kbCount').textContent='Không tải được dữ liệu'});
+</script></body></html>

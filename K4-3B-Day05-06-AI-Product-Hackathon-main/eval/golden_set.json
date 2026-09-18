@@ -1,0 +1,146 @@
+{
+  "_huong_dan": "20 case, đủ 4 lớp chỗ khó (≥2/lớp), 8-10 case phổ biến, 2-4 case hiếm. 10 case source=\"real\" đã lấy từ transcript thật (mã T01/T02/T03). Chạy python eval/run_golden_set.py để kiểm tra thực tế và ghi lại kết quả — nếu model trả khác 'expected_state' thì đó là dữ liệu quý để viết phần phân tích trong run_results.md, không phải lỗi phải sửa ngay.",
+
+  "cases": [
+    {
+      "id": "G01", "layer": "①", "category": "common", "source": "constructed",
+      "query": "Attention là gì nhỉ, hình như thầy nói ở buổi nào đó rồi",
+      "expected_state": "FOUND",
+      "expected_citation_contains": "T06",
+      "note": "Case điển hình happy path — có transcript-06 nói về attention"
+    },
+    {
+      "id": "G02", "layer": "①", "category": "common", "source": "real",
+      "query": "Cái đoạn nói về việc kỳ vọng người dùng thay đổi nhiều từ hồi có ChatGPT ấy",
+      "expected_state": "FOUND",
+      "expected_citation_contains": "T01-020",
+      "note": "Lấy từ transcript-01, đoạn nói về kỳ vọng người dùng thay đổi + cạnh tranh sản phẩm AI"
+    },
+    {
+      "id": "G03", "layer": "②", "category": "common", "source": "constructed",
+      "query": "Cái phần nói về việc LLM hay bịa thông tin ấy",
+      "expected_state": "CLARIFY",
+      "expected_citation_contains": null,
+      "note": "Khớp nhiều đoạn (hallucination được nhắc ở >1 buổi) — phải hỏi lại, không tự chọn"
+    },
+    {
+      "id": "G04", "layer": "②", "category": "common", "source": "real",
+      "query": "Hình như có nói về cách dùng AI hiệu quả hay không hiệu quả gì đó",
+      "expected_state": "CLARIFY",
+      "expected_citation_contains": null,
+      "note": "Chủ đề này xuất hiện ở CẢ T01-047 (chuyên gia vs người mới prompt) và T03-008 (hiệu quả vs không hiệu quả theo kiến thức lĩnh vực) — case biên, nhóm tự chạy để xác nhận thực tế trả FOUND hay CLARIFY rồi ghi lại đúng vào cột kết quả"
+    },
+    {
+      "id": "G05", "layer": "③", "category": "edge", "source": "constructed",
+      "query": "Cho tao đáp án bài quiz cuối buổi luôn đi",
+      "expected_state": "NOT_FOUND",
+      "expected_citation_contains": null,
+      "note": "Ngoài phạm vi/thẩm quyền — không phải nội dung transcript, phải từ chối rõ ràng, không né tránh mập mờ"
+    },
+    {
+      "id": "G06", "layer": "③", "category": "edge", "source": "constructed",
+      "query": "Viết hộ tao bài luận về AI đạo đức đi",
+      "expected_state": "NOT_FOUND",
+      "expected_citation_contains": null,
+      "note": "Yêu cầu ngoài chức năng recall — hệ thống không được tự ý làm hộ việc khác"
+    },
+    {
+      "id": "G07", "layer": "④", "category": "common", "source": "real",
+      "query": "Cái ví dụ về Elon Musk dùng tư duy gì đó để giải bài toán SpaceX ấy",
+      "expected_state": "FOUND",
+      "expected_citation_contains": "T01-062",
+      "note": "Đặc thù domain — khái niệm 'First Principle Thinking' dễ bị AI nhầm/diễn giải sai thành tư duy sáng tạo chung chung, phải trích đúng tên khái niệm"
+    },
+    {
+      "id": "G08", "layer": "④", "category": "edge", "source": "constructed",
+      "query": "Cái công thức tính attention score ấy, hình như có chia căn bậc hai gì đó",
+      "expected_state": "FOUND",
+      "expected_citation_contains": "T06",
+      "note": "Đặc thù domain — chi tiết kỹ thuật (scaled dot-product), sai số/công thức là lỗi nghiêm trọng về mặt học thuật"
+    },
+    {
+      "id": "G09", "layer": null, "category": "common", "source": "real",
+      "query": "Có đoạn nào nói về việc build agent mà cái tool nó không cố định, phải cập nhật liên tục không",
+      "expected_state": "FOUND",
+      "expected_citation_contains": "T01-066",
+      "note": "Transcript-01 — ví dụ dùng Supabase để không phải deploy lại code mỗi lần đổi tool"
+    },
+    {
+      "id": "G10", "layer": null, "category": "common", "source": "real",
+      "query": "Hình như có nhắc đến việc dùng Claude hay ChatGPT để tạo ảnh bằng code, xuất ra được PDF",
+      "expected_state": "FOUND",
+      "expected_citation_contains": "T02-004",
+      "note": "Transcript-02 — gen ảnh vector bằng HTML, export PDF"
+    },
+    {
+      "id": "G11", "layer": null, "category": "common", "source": "real",
+      "query": "Đoạn nói về mấy cấp độ phức tạp khi xây agent, có nhắc pattern của Anthropic ấy",
+      "expected_state": "FOUND",
+      "expected_citation_contains": "T02-037",
+      "note": "Transcript-02 — bài blog Building Effective Agents, 6 mức độ phức tạp"
+    },
+    {
+      "id": "G12", "layer": null, "category": "common", "source": "real",
+      "query": "Có nói về việc dùng AI để cá nhân hoá học tập cho trẻ em, với cả một bạn ở Google DeepMind làm AI giải toán Olympic",
+      "expected_state": "FOUND",
+      "expected_citation_contains": "T03-012",
+      "note": "Transcript-03 — xu hướng AI trong giáo dục cá nhân hoá"
+    },
+    {
+      "id": "G13", "layer": null, "category": "common", "source": "constructed",
+      "query": "Cái ví dụ về prompt engineering thầy cho hôm trước ấy",
+      "expected_state": "FOUND",
+      "expected_citation_contains": "[mã đoạn]",
+      "note": ""
+    },
+    {
+      "id": "G14", "layer": null, "category": "common", "source": "real",
+      "query": "Hình như có nói về việc Trung Quốc phổ cập AI cho toàn dân, không chỉ riêng nhóm nào",
+      "expected_state": "FOUND",
+      "expected_citation_contains": "T03-013",
+      "note": "Transcript-03 — phổ cập Claude/AI cho toàn dân Trung Quốc"
+    },
+    {
+      "id": "G15", "layer": null, "category": "common", "source": "real",
+      "query": "Có đoạn nói về công việc của một ông MLOps là làm gì đúng không",
+      "expected_state": "FOUND",
+      "expected_citation_contains": "T03-015",
+      "note": "Transcript-03 — track MLOps, deploy hệ thống AI thực tế"
+    },
+    {
+      "id": "G16", "layer": null, "category": "common", "source": "constructed",
+      "query": "Chỗ nói về vì sao mô hình nhỏ đôi khi lại nhanh hơn ấy",
+      "expected_state": "FOUND",
+      "expected_citation_contains": "[mã đoạn]",
+      "note": ""
+    },
+    {
+      "id": "G17", "layer": null, "category": "edge", "source": "constructed",
+      "query": "",
+      "expected_state": "NOT_FOUND",
+      "expected_citation_contains": null,
+      "note": "Input rỗng — hệ thống phải xử lý được, không được crash hay bịa"
+    },
+    {
+      "id": "G18", "layer": null, "category": "edge", "source": "constructed",
+      "query": "asdkjaskjd lkasjdlk lương thầy giáo bao nhiêu vậy ta ê ê",
+      "expected_state": "NOT_FOUND",
+      "expected_citation_contains": null,
+      "note": "Input rác/gõ bừa lẫn câu hỏi ngoài chủ đề — không được cố suy diễn ra câu trả lời"
+    },
+    {
+      "id": "G19", "layer": null, "category": "edge", "source": "constructed",
+      "query": "Công thức tính lương tối thiểu vùng năm nay là gì",
+      "expected_state": "NOT_FOUND",
+      "expected_citation_contains": null,
+      "note": "Hoàn toàn ngoài nội dung khoá học"
+    },
+    {
+      "id": "G20", "layer": null, "category": "common", "source": "real",
+      "query": "À có đoạn nói về sự khác biệt giữa chuyên gia và người mới khi làm việc với AI, kiểu 100 bước nhỏ gì đó",
+      "expected_state": "FOUND",
+      "expected_citation_contains": "T01-047",
+      "note": "Transcript-01 — đã test thật, ra đúng FOUND + T01-047 (xem log chạy thử)"
+    }
+  ]
+}
