@@ -144,4 +144,6 @@ $('close').onclick=()=>$('modalBg').style.display='none';$('modalBg').onclick=e=
 $('flip').onclick=()=>{if(!LAST.length)return;$('flash').textContent=FLASH?$('q').value:LAST[0].text.slice(0,420);FLASH=!FLASH};
 $('newQuiz').onclick=()=>{if(!LAST.length)return;let d=LAST[QUIZ++%Math.min(3,LAST.length)];$('quiz').innerHTML=`Đoạn <b>${esc(d.id)}</b> đang giải thích ý chính nào?<br><br><span class="meta">Hãy tự trả lời rồi mở nguồn để kiểm tra.</span>`};
 fetch('vlearn_data.json').then(r=>r.json()).then(d=>{DOCS=d;$('kbCount').textContent=d.length+' knowledge chunks';$('chunkStat').textContent=d.length;renderLessons()}).catch(()=>{$('kbCount').textContent='Không tải được dữ liệu'});
-</script></body></html>
+</script></body></html>  
+
+
